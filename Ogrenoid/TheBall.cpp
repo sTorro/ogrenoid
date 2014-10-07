@@ -15,46 +15,28 @@
  * Copyright ® 2014 Sergio Torró.
  */
 
-#pragma once
-#ifndef _OGRENOID_H_
-#define _OGRENOID_H_
-
 #include "stdafx.h"
 #include "TheBall.hpp"
-#include "Paddle.hpp"
 
-class Ogrenoid : public Ogre::FrameListener, public OIS::KeyListener
+TheBall::TheBall(Ogre::SceneManager* sceneManager)
+	: m_sceneManager(sceneManager), m_speed(100), m_direction(Ogre::Vector3(1, -1, 0))
 {
-	public:
-		Ogrenoid(void);
-		~Ogrenoid(void);
-		void go(void);
+	//Add the ball to the scene
+	Ogre::Entity* ballEntity = m_sceneManager->createEntity("Ball", "theBall.mesh");
+	// Create a SceneNode and attach the Entity to it
+	m_ballNode = m_sceneManager->getRootSceneNode()->createChildSceneNode("BallNode");
+	m_ballNode->attachObject(ballEntity);
+	m_ballNode->setScale(Ogre::Real(2.0F), Ogre::Real(2.0F), Ogre::Real(2.0F));
+}
 
-	protected:
-		void createScene(void);
+TheBall::~TheBall(void)
+{
+	//Empty
+}
 
-		// Rendering
-		bool frameStarted(const Ogre::FrameEvent&);
-		bool frameEnded(const Ogre::FrameEvent&);
+void TheBall::move(Ogre::Real time)
+{
+	m_ballNode->translate((m_direction * (m_speed * time)));
 
-		// Keyboard
-		bool keyPressed(const OIS::KeyEvent&);
-		bool keyReleased(const OIS::KeyEvent&);
-
-	private:
-		Ogre::Root* m_root;
-		Ogre::SceneManager* m_sceneManager;
-		Ogre::RenderWindow* m_renderWindow;
-		Ogre::Viewport* m_viewport;
-		Ogre::Camera* m_camera;
-
-		OIS::InputManager* m_inputManager;
-		OIS::Keyboard* m_keyboard;
-
-		TheBall* m_theBall;
-		Paddle* m_playerPaddle;
-
-		bool m_shutDown;
-};
-
-#endif //_OGRENOID_H_
+	//TODO check collisions and change direction...
+}

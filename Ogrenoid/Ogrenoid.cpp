@@ -42,11 +42,6 @@ Ogrenoid::Ogrenoid(void) : m_root(new Ogre::Root), m_shutDown(false)
 	auto aspectRatio = Ogre::Real(m_viewport->getActualWidth()) / (m_viewport->getActualHeight());
 	m_camera->setAspectRatio(aspectRatio);
 
-	//Ambient light
-	m_sceneManager->setAmbientLight(Ogre::ColourValue(0.75, 0.75, 0.75));
-	Ogre::Light* lightPtr = m_sceneManager->createLight("ambientLight");
-	lightPtr->setPosition(0, 0, 50);
-
 	//Render window parameters
 	unsigned long hWnd;
 	m_renderWindow->getCustomAttribute("WINDOW", &hWnd);
@@ -63,6 +58,10 @@ Ogrenoid::Ogrenoid(void) : m_root(new Ogre::Root), m_shutDown(false)
 	m_root->addFrameListener(this);
 
 	//TODO: Load resources
+
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("assets/meshes",
+	    "FileSystem", "meshes" );
+	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
 Ogrenoid::~Ogrenoid(void)
@@ -84,7 +83,41 @@ void Ogrenoid::go(void)
 
 void Ogrenoid::createScene(void)
 {
-	//TODO
+	m_theBall = new TheBall(m_sceneManager);
+	m_playerPaddle = new Paddle(m_sceneManager);
+
+	//Left wall
+	auto leftWallEntity = m_sceneManager->createEntity("leftWall", "cube.mesh");
+	auto leftWallNode = m_sceneManager->getRootSceneNode()->createChildSceneNode("leftWall");
+	leftWallNode->attachObject(leftWallEntity);
+	leftWallNode->setPosition(-110, 0, 0);
+	leftWallNode->setScale(2.0, 100.00, 1.0);
+
+	//Right wall
+	auto rightWallEntity = m_sceneManager->createEntity("rightWall", "cube.mesh");
+	auto rightWallNode = m_sceneManager->getRootSceneNode()->createChildSceneNode("rightWall");
+	rightWallNode->attachObject(rightWallEntity);
+	rightWallNode->setPosition(110, 0, 0);
+	rightWallNode->setScale(2.0, 100.00, 1.0);
+
+	//Upper wall
+	auto upperWallEntity = m_sceneManager->createEntity("upperWall", "cube.mesh");
+	auto upperWallNode = m_sceneManager->getRootSceneNode()->createChildSceneNode("upperWall");
+	upperWallNode->attachObject(upperWallEntity);
+	upperWallNode->setPosition(0, 82, 0);
+	upperWallNode->setScale(190.0, 2.0, 1.0);
+
+	//Bottom wall
+	auto bottomWallEntity = m_sceneManager->createEntity("bottomWall", "cube.mesh");
+	auto bottomWallNode = m_sceneManager->getRootSceneNode()->createChildSceneNode("bottomWall");
+	bottomWallNode->attachObject(bottomWallEntity);
+	bottomWallNode->setPosition(0, -82, 0);
+	bottomWallNode->setScale(190.0, 2.0, 1.0);
+
+	//Ambient light
+	m_sceneManager->setAmbientLight(Ogre::ColourValue(0.75, 0.75, 0.75));
+	Ogre::Light* lightPtr = m_sceneManager->createLight("ambientLight");
+	lightPtr->setPosition(0, 0, 50);
 }
 
 //////////////////////////////////////////////////////////////////
@@ -93,6 +126,8 @@ void Ogrenoid::createScene(void)
 bool Ogrenoid::frameStarted(const Ogre::FrameEvent& arg)
 {
 	m_keyboard->capture();
+	m_theBall->move(arg.timeSinceLastFrame);
+
 	return !m_shutDown;
 }
 

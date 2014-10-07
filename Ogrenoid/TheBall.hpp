@@ -16,45 +16,22 @@
  */
 
 #pragma once
-#ifndef _OGRENOID_H_
-#define _OGRENOID_H_
+#ifndef _THE_BALL_H_
+#define _THE_BALL_H_
 
-#include "stdafx.h"
-#include "TheBall.hpp"
-#include "Paddle.hpp"
-
-class Ogrenoid : public Ogre::FrameListener, public OIS::KeyListener
+class TheBall
 {
 	public:
-		Ogrenoid(void);
-		~Ogrenoid(void);
-		void go(void);
+		explicit TheBall(Ogre::SceneManager*);
+		~TheBall(void);
 
-	protected:
-		void createScene(void);
-
-		// Rendering
-		bool frameStarted(const Ogre::FrameEvent&);
-		bool frameEnded(const Ogre::FrameEvent&);
-
-		// Keyboard
-		bool keyPressed(const OIS::KeyEvent&);
-		bool keyReleased(const OIS::KeyEvent&);
+		void move(Ogre::Real);
 
 	private:
-		Ogre::Root* m_root;
 		Ogre::SceneManager* m_sceneManager;
-		Ogre::RenderWindow* m_renderWindow;
-		Ogre::Viewport* m_viewport;
-		Ogre::Camera* m_camera;
-
-		OIS::InputManager* m_inputManager;
-		OIS::Keyboard* m_keyboard;
-
-		TheBall* m_theBall;
-		Paddle* m_playerPaddle;
-
-		bool m_shutDown;
+		Ogre::SceneNode* m_ballNode;
+		int m_speed;
+		Ogre::Vector3 m_direction;
 };
 
-#endif //_OGRENOID_H_
+#endif //_THE_BALL_H_
